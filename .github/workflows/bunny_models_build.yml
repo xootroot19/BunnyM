@@ -24,6 +24,10 @@ jobs:
           flutter create --platforms=android bunny_models
           cd bunny_models
 
+          # Remove o teste padrão que referencia MyApp
+          rm -f test/widget_test.dart
+
+          # Cria o pubspec
           cat > pubspec.yaml <<'EOF'
           name: bunny_models
           description: Bunny Models agency management app
@@ -46,6 +50,7 @@ jobs:
             uses-material-design: true
           EOF
 
+          # Cria o app Flutter
           cat > lib/main.dart <<'EOF'
           import 'package:flutter/material.dart';
 
@@ -286,7 +291,7 @@ jobs:
                 (sum, job) => sum + job.amount,
               );
 
-              final average = jobs.isEmpty ? 0 : total / jobs.length;
+              final average = jobs.isEmpty ? 0.0 : total / jobs.length;
 
               return Column(
                 children: [
@@ -305,7 +310,12 @@ jobs:
                   ),
                   Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
+                      padding: const EdgeInsets.fromLTRB(
+                        20,
+                        10,
+                        20,
+                        28,
+                      ),
                       children: [
                         const Text(
                           'PAINEL DA AGÊNCIA',
@@ -337,26 +347,35 @@ jobs:
                           ),
                         ),
                         const SizedBox(height: 22),
+
                         FinanceHeroCard(
                           total: total,
                           jobs: jobs.length,
-                          average: average.toDouble(),
+                          average: average,
                         ),
+
                         const SizedBox(height: 14),
-                        NewJobCard(onTap: onNewJob),
+
+                        NewJobCard(
+                          onTap: onNewJob,
+                        ),
+
                         const SizedBox(height: 30),
+
                         Row(
                           children: [
                             const Expanded(
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'ATIVIDADE',
                                     style: TextStyle(
                                       color: BunnyColors.rose,
                                       fontSize: 9,
-                                      fontWeight: FontWeight.w900,
+                                      fontWeight:
+                                          FontWeight.w900,
                                       letterSpacing: 1.5,
                                     ),
                                   ),
@@ -366,35 +385,45 @@ jobs:
                                     style: TextStyle(
                                       color: BunnyColors.text,
                                       fontSize: 21,
-                                      fontWeight: FontWeight.w800,
+                                      fontWeight:
+                                          FontWeight.w800,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(
+                              padding:
+                                  const EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 7,
                               ),
                               decoration: BoxDecoration(
                                 color: BunnyColors.roseSoft,
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius:
+                                    BorderRadius.circular(12),
                               ),
                               child: Text(
                                 '${jobs.length}',
                                 style: const TextStyle(
-                                  color: BunnyColors.roseDark,
-                                  fontWeight: FontWeight.w800,
+                                  color:
+                                      BunnyColors.roseDark,
+                                  fontWeight:
+                                      FontWeight.w800,
                                 ),
                               ),
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 13),
+
                         ...jobs.map(
                           (job) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
+                            padding:
+                                const EdgeInsets.only(
+                              bottom: 12,
+                            ),
                             child: JobCard(job: job),
                           ),
                         ),
@@ -425,7 +454,9 @@ jobs:
                 decoration: BoxDecoration(
                   color: BunnyColors.white,
                   borderRadius: BorderRadius.circular(26),
-                  border: Border.all(color: BunnyColors.border),
+                  border: Border.all(
+                    color: BunnyColors.border,
+                  ),
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0x0D4E2736),
@@ -435,7 +466,8 @@ jobs:
                   ],
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
@@ -443,38 +475,47 @@ jobs:
                           width: 46,
                           height: 46,
                           decoration: BoxDecoration(
-                            color: BunnyColors.roseSoft,
-                            borderRadius: BorderRadius.circular(15),
+                            color:
+                                BunnyColors.roseSoft,
+                            borderRadius:
+                                BorderRadius.circular(15),
                           ),
                           child: const Icon(
-                            Icons.account_balance_wallet_outlined,
+                            Icons
+                                .account_balance_wallet_outlined,
                             color: BunnyColors.rose,
                           ),
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(
+                          padding:
+                              const EdgeInsets.symmetric(
                             horizontal: 10,
                             vertical: 7,
                           ),
                           decoration: BoxDecoration(
-                            color: BunnyColors.greenSoft,
-                            borderRadius: BorderRadius.circular(20),
+                            color:
+                                BunnyColors.greenSoft,
+                            borderRadius:
+                                BorderRadius.circular(20),
                           ),
                           child: const Row(
                             children: [
                               Icon(
                                 Icons.trending_up_rounded,
                                 size: 15,
-                                color: BunnyColors.green,
+                                color:
+                                    BunnyColors.green,
                               ),
                               SizedBox(width: 4),
                               Text(
                                 'Financeiro',
                                 style: TextStyle(
-                                  color: BunnyColors.green,
+                                  color:
+                                      BunnyColors.green,
                                   fontSize: 11,
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight:
+                                      FontWeight.w700,
                                 ),
                               ),
                             ],
@@ -482,7 +523,9 @@ jobs:
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 19),
+
                     const Text(
                       'Faturamento registrado',
                       style: TextStyle(
@@ -490,7 +533,9 @@ jobs:
                         fontSize: 13,
                       ),
                     ),
+
                     const SizedBox(height: 3),
+
                     Text(
                       money(total),
                       style: const TextStyle(
@@ -500,9 +545,15 @@ jobs:
                         letterSpacing: -1.0,
                       ),
                     ),
+
                     const SizedBox(height: 18),
-                    const Divider(color: BunnyColors.border),
+
+                    const Divider(
+                      color: BunnyColors.border,
+                    ),
+
                     const SizedBox(height: 12),
+
                     Row(
                       children: [
                         Expanded(
@@ -544,7 +595,8 @@ jobs:
             @override
             Widget build(BuildContext context) {
               return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
                     label,
@@ -584,8 +636,11 @@ jobs:
                   padding: const EdgeInsets.all(17),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF8FA),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: BunnyColors.roseSoft),
+                    borderRadius:
+                        BorderRadius.circular(22),
+                    border: Border.all(
+                      color: BunnyColors.roseSoft,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -594,7 +649,8 @@ jobs:
                         height: 48,
                         decoration: BoxDecoration(
                           color: BunnyColors.roseSoft,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius:
+                              BorderRadius.circular(16),
                         ),
                         child: const Icon(
                           Icons.add_rounded,
@@ -602,30 +658,36 @@ jobs:
                           size: 28,
                         ),
                       ),
+
                       const SizedBox(width: 13),
+
                       const Expanded(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Registrar novo job',
                               style: TextStyle(
                                 color: BunnyColors.text,
                                 fontSize: 15,
-                                fontWeight: FontWeight.w800,
+                                fontWeight:
+                                    FontWeight.w800,
                               ),
                             ),
                             SizedBox(height: 4),
                             Text(
                               'Cliente, cachê, localização e produção.',
                               style: TextStyle(
-                                color: BunnyColors.muted,
+                                color:
+                                    BunnyColors.muted,
                                 fontSize: 11.5,
                               ),
                             ),
                           ],
                         ),
                       ),
+
                       const Icon(
                         Icons.arrow_forward_rounded,
                         color: BunnyColors.rose,
@@ -652,7 +714,9 @@ jobs:
                 decoration: BoxDecoration(
                   color: BunnyColors.white,
                   borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: BunnyColors.border),
+                  border: Border.all(
+                    color: BunnyColors.border,
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -662,25 +726,33 @@ jobs:
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: BunnyColors.roseSoft,
-                            borderRadius: BorderRadius.circular(14),
+                            color:
+                                BunnyColors.roseSoft,
+                            borderRadius:
+                                BorderRadius.circular(14),
                           ),
                           child: const Icon(
-                            Icons.business_center_outlined,
+                            Icons
+                                .business_center_outlined,
                             color: BunnyColors.rose,
                             size: 21,
                           ),
                         ),
+
                         const SizedBox(width: 12),
+
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
                             children: [
                               Text(
                                 job.client,
                                 style: const TextStyle(
-                                  color: BunnyColors.text,
-                                  fontWeight: FontWeight.w800,
+                                  color:
+                                      BunnyColors.text,
+                                  fontWeight:
+                                      FontWeight.w800,
                                   fontSize: 15,
                                 ),
                               ),
@@ -688,35 +760,43 @@ jobs:
                               Text(
                                 '${job.role} • ${job.date}',
                                 style: const TextStyle(
-                                  color: BunnyColors.faint,
+                                  color:
+                                      BunnyColors.faint,
                                   fontSize: 11,
                                 ),
                               ),
                             ],
                           ),
                         ),
+
                         Container(
-                          padding: const EdgeInsets.symmetric(
+                          padding:
+                              const EdgeInsets.symmetric(
                             horizontal: 9,
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: BunnyColors.goldSoft,
-                            borderRadius: BorderRadius.circular(11),
+                            color:
+                                BunnyColors.goldSoft,
+                            borderRadius:
+                                BorderRadius.circular(11),
                           ),
                           child: Row(
                             children: [
                               const Icon(
                                 Icons.star_rounded,
                                 size: 14,
-                                color: BunnyColors.gold,
+                                color:
+                                    BunnyColors.gold,
                               ),
                               const SizedBox(width: 3),
                               Text(
                                 '${job.rating}',
                                 style: const TextStyle(
-                                  color: BunnyColors.gold,
-                                  fontWeight: FontWeight.w800,
+                                  color:
+                                      BunnyColors.gold,
+                                  fontWeight:
+                                      FontWeight.w800,
                                   fontSize: 11,
                                 ),
                               ),
@@ -725,7 +805,9 @@ jobs:
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 13),
+
                     Row(
                       children: [
                         const Icon(
@@ -738,7 +820,8 @@ jobs:
                           child: Text(
                             job.location,
                             style: const TextStyle(
-                              color: BunnyColors.muted,
+                              color:
+                                  BunnyColors.muted,
                               fontSize: 11.5,
                             ),
                           ),
@@ -746,8 +829,10 @@ jobs:
                         Text(
                           money(job.amount),
                           style: const TextStyle(
-                            color: BunnyColors.roseDark,
-                            fontWeight: FontWeight.w900,
+                            color:
+                                BunnyColors.roseDark,
+                            fontWeight:
+                                FontWeight.w900,
                             fontSize: 13,
                           ),
                         ),
@@ -772,9 +857,16 @@ jobs:
               return Column(
                 children: [
                   const BrandHeader(),
+
                   Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+                      padding:
+                          const EdgeInsets.fromLTRB(
+                        20,
+                        18,
+                        20,
+                        28,
+                      ),
                       children: [
                         const PageTitle(
                           eyebrow: 'AGENDA',
@@ -782,13 +874,20 @@ jobs:
                           subtitle:
                               'Acompanhe trabalhos confirmados, concluídos e futuros.',
                         ),
+
                         const SizedBox(height: 18),
+
                         Container(
-                          padding: const EdgeInsets.all(4),
+                          padding:
+                              const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             color: BunnyColors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: BunnyColors.border),
+                            borderRadius:
+                                BorderRadius.circular(15),
+                            border: Border.all(
+                              color:
+                                  BunnyColors.border,
+                            ),
                           ),
                           child: const Row(
                             children: [
@@ -811,10 +910,15 @@ jobs:
                             ],
                           ),
                         ),
+
                         const SizedBox(height: 18),
+
                         ...jobs.map(
                           (job) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
+                            padding:
+                                const EdgeInsets.only(
+                              bottom: 12,
+                            ),
                             child: JobCard(job: job),
                           ),
                         ),
@@ -839,17 +943,24 @@ jobs:
             @override
             Widget build(BuildContext context) {
               return Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
-                  color: selected ? BunnyColors.roseSoft : Colors.transparent,
-                  borderRadius: BorderRadius.circular(11),
+                  color: selected
+                      ? BunnyColors.roseSoft
+                      : Colors.transparent,
+                  borderRadius:
+                      BorderRadius.circular(11),
                 ),
                 child: Text(
                   label,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color:
-                        selected ? BunnyColors.roseDark : BunnyColors.muted,
+                    color: selected
+                        ? BunnyColors.roseDark
+                        : BunnyColors.muted,
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                   ),
@@ -883,7 +994,8 @@ jobs:
                 title: 'Financeiro',
                 subtitle:
                     'Cachês, despesas, pagamentos pendentes e relatórios.',
-                icon: Icons.account_balance_wallet_outlined,
+                icon:
+                    Icons.account_balance_wallet_outlined,
               );
             }
           }
@@ -922,57 +1034,87 @@ jobs:
               return Column(
                 children: [
                   const BrandHeader(),
+
                   Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+                      padding:
+                          const EdgeInsets.fromLTRB(
+                        20,
+                        18,
+                        20,
+                        28,
+                      ),
                       children: [
                         PageTitle(
                           eyebrow: eyebrow,
                           title: title,
                           subtitle: subtitle,
                         ),
+
                         const SizedBox(height: 24),
+
                         Container(
                           height: 250,
                           decoration: BoxDecoration(
                             color: BunnyColors.white,
-                            borderRadius: BorderRadius.circular(26),
-                            border: Border.all(color: BunnyColors.border),
+                            borderRadius:
+                                BorderRadius.circular(26),
+                            border: Border.all(
+                              color:
+                                  BunnyColors.border,
+                            ),
                           ),
                           child: Center(
                             child: Column(
-                              mainAxisSize: MainAxisSize.min,
+                              mainAxisSize:
+                                  MainAxisSize.min,
                               children: [
                                 Container(
                                   width: 64,
                                   height: 64,
-                                  decoration: BoxDecoration(
-                                    color: BunnyColors.roseSoft,
-                                    borderRadius: BorderRadius.circular(21),
+                                  decoration:
+                                      BoxDecoration(
+                                    color: BunnyColors
+                                        .roseSoft,
+                                    borderRadius:
+                                        BorderRadius
+                                            .circular(21),
                                   ),
                                   child: Icon(
                                     icon,
-                                    color: BunnyColors.rose,
+                                    color:
+                                        BunnyColors.rose,
                                     size: 28,
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(
+                                  height: 16,
+                                ),
                                 const Text(
                                   'Área pronta para evoluir',
                                   style: TextStyle(
-                                    color: BunnyColors.text,
-                                    fontWeight: FontWeight.w800,
+                                    color:
+                                        BunnyColors.text,
+                                    fontWeight:
+                                        FontWeight.w800,
                                     fontSize: 16,
                                   ),
                                 ),
-                                const SizedBox(height: 7),
+                                const SizedBox(
+                                  height: 7,
+                                ),
                                 const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 28),
+                                  padding:
+                                      EdgeInsets.symmetric(
+                                    horizontal: 28,
+                                  ),
                                   child: Text(
                                     'Esta tela já faz parte da navegação e pode receber os recursos reais do produto.',
-                                    textAlign: TextAlign.center,
+                                    textAlign:
+                                        TextAlign.center,
                                     style: TextStyle(
-                                      color: BunnyColors.muted,
+                                      color: BunnyColors
+                                          .muted,
                                       fontSize: 12,
                                       height: 1.45,
                                     ),
@@ -1005,7 +1147,8 @@ jobs:
             @override
             Widget build(BuildContext context) {
               return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
                     eyebrow,
@@ -1044,14 +1187,20 @@ jobs:
             const NewJobPage({super.key});
 
             @override
-            State<NewJobPage> createState() => _NewJobPageState();
+            State<NewJobPage> createState() =>
+                _NewJobPageState();
           }
 
-          class _NewJobPageState extends State<NewJobPage> {
-            final client = TextEditingController();
-            final contact = TextEditingController();
-            final location = TextEditingController();
-            final fee = TextEditingController();
+          class _NewJobPageState
+              extends State<NewJobPage> {
+            final client =
+                TextEditingController();
+            final contact =
+                TextEditingController();
+            final location =
+                TextEditingController();
+            final fee =
+                TextEditingController();
 
             @override
             void dispose() {
@@ -1059,117 +1208,191 @@ jobs:
               contact.dispose();
               location.dispose();
               fee.dispose();
+
               super.dispose();
             }
 
             @override
             Widget build(BuildContext context) {
               return Scaffold(
-                backgroundColor: BunnyColors.background,
+                backgroundColor:
+                    BunnyColors.background,
                 appBar: AppBar(
-                  backgroundColor: BunnyColors.background,
-                  surfaceTintColor: Colors.transparent,
+                  backgroundColor:
+                      BunnyColors.background,
+                  surfaceTintColor:
+                      Colors.transparent,
                   elevation: 0,
                   centerTitle: true,
                   title: const Text(
                     'Novo job',
                     style: TextStyle(
                       color: BunnyColors.text,
-                      fontWeight: FontWeight.w800,
+                      fontWeight:
+                          FontWeight.w800,
                       fontSize: 17,
                     ),
                   ),
                 ),
+
                 body: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 30),
+                  padding:
+                      const EdgeInsets.fromLTRB(
+                    20,
+                    14,
+                    20,
+                    30,
+                  ),
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(18),
+                      padding:
+                          const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         color: BunnyColors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: BunnyColors.border),
+                        borderRadius:
+                            BorderRadius.circular(24),
+                        border: Border.all(
+                          color:
+                              BunnyColors.border,
+                        ),
                       ),
                       child: const Column(
                         children: [
                           CircleAvatar(
                             radius: 28,
-                            backgroundColor: BunnyColors.roseSoft,
+                            backgroundColor:
+                                BunnyColors.roseSoft,
                             child: Icon(
-                              Icons.work_outline_rounded,
-                              color: BunnyColors.rose,
+                              Icons
+                                  .work_outline_rounded,
+                              color:
+                                  BunnyColors.rose,
                             ),
                           ),
                           SizedBox(height: 12),
                           Text(
                             'Dados do trabalho',
                             style: TextStyle(
-                              color: BunnyColors.text,
+                              color:
+                                  BunnyColors.text,
                               fontSize: 21,
-                              fontWeight: FontWeight.w900,
+                              fontWeight:
+                                  FontWeight.w900,
                             ),
                           ),
                           SizedBox(height: 5),
                           Text(
                             'Registre as principais informações do job.',
                             style: TextStyle(
-                              color: BunnyColors.muted,
+                              color:
+                                  BunnyColors.muted,
                               fontSize: 12,
                             ),
                           ),
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 22),
+
                     BunnyField(
                       label: 'Cliente / marca',
-                      icon: Icons.business_outlined,
+                      icon:
+                          Icons.business_outlined,
                       controller: client,
-                      hint: 'Ex: Maison Lumière',
+                      hint:
+                          'Ex: Maison Lumière',
                     ),
+
                     BunnyField(
-                      label: 'Contato responsável',
-                      icon: Icons.person_outline_rounded,
+                      label:
+                          'Contato responsável',
+                      icon:
+                          Icons.person_outline_rounded,
                       controller: contact,
-                      hint: 'Nome do produtor ou responsável',
+                      hint:
+                          'Nome do produtor ou responsável',
                     ),
+
                     BunnyField(
                       label: 'Local do job',
-                      icon: Icons.location_on_outlined,
+                      icon:
+                          Icons.location_on_outlined,
                       controller: location,
-                      hint: 'Estúdio, endereço ou região',
+                      hint:
+                          'Estúdio, endereço ou região',
                     ),
+
                     BunnyField(
                       label: 'Cachê',
-                      icon: Icons.payments_outlined,
+                      icon:
+                          Icons.payments_outlined,
                       controller: fee,
                       hint: '0,00',
                       keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                          const TextInputType
+                              .numberWithOptions(
+                        decimal: true,
+                      ),
                     ),
+
                     const SizedBox(height: 6),
+
                     FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: BunnyColors.rose,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(54),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(17),
+                      style:
+                          FilledButton.styleFrom(
+                        backgroundColor:
+                            BunnyColors.rose,
+                        foregroundColor:
+                            Colors.white,
+                        minimumSize:
+                            const Size.fromHeight(
+                          54,
+                        ),
+                        shape:
+                            RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(
+                            17,
+                          ),
                         ),
                       ),
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        if (client.text
+                            .trim()
+                            .isEmpty) {
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Informe o cliente ou marca.',
+                              ),
+                            ),
+                          );
+
+                          return;
+                        }
+
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(
                           const SnackBar(
                             content: Text(
-                              'Protótipo: job validado visualmente.',
+                              'Job cadastrado no protótipo ✨',
                             ),
                           ),
                         );
                       },
-                      icon: const Icon(Icons.arrow_forward_rounded),
+                      icon: const Icon(
+                        Icons.arrow_forward_rounded,
+                      ),
                       label: const Text(
                         'Continuar',
-                        style: TextStyle(fontWeight: FontWeight.w900),
+                        style: TextStyle(
+                          fontWeight:
+                              FontWeight.w900,
+                        ),
                       ),
                     ),
                   ],
@@ -1197,48 +1420,74 @@ jobs:
             @override
             Widget build(BuildContext context) {
               return Padding(
-                padding: const EdgeInsets.only(bottom: 15),
+                padding:
+                    const EdgeInsets.only(
+                  bottom: 15,
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     Text(
                       label,
                       style: const TextStyle(
                         color: BunnyColors.text,
                         fontSize: 12,
-                        fontWeight: FontWeight.w700,
+                        fontWeight:
+                            FontWeight.w700,
                       ),
                     ),
+
                     const SizedBox(height: 8),
+
                     TextField(
                       controller: controller,
                       keyboardType: keyboardType,
                       decoration: InputDecoration(
                         hintText: hint,
-                        hintStyle: const TextStyle(
-                          color: BunnyColors.faint,
+                        hintStyle:
+                            const TextStyle(
+                          color:
+                              BunnyColors.faint,
                           fontSize: 13,
                         ),
                         prefixIcon: Icon(
                           icon,
-                          color: BunnyColors.faint,
+                          color:
+                              BunnyColors.faint,
                           size: 20,
                         ),
                         filled: true,
-                        fillColor: BunnyColors.white,
-                        contentPadding: const EdgeInsets.symmetric(
+                        fillColor:
+                            BunnyColors.white,
+                        contentPadding:
+                            const EdgeInsets
+                                .symmetric(
                           horizontal: 14,
                           vertical: 17,
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                        enabledBorder:
+                            OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(
+                            16,
+                          ),
                           borderSide:
-                              const BorderSide(color: BunnyColors.border),
+                              const BorderSide(
+                            color:
+                                BunnyColors.border,
+                          ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
-                            color: BunnyColors.rose,
+                        focusedBorder:
+                            OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(
+                            16,
+                          ),
+                          borderSide:
+                              const BorderSide(
+                            color:
+                                BunnyColors.rose,
                             width: 1.4,
                           ),
                         ),
@@ -1269,29 +1518,50 @@ jobs:
           }
 
           String money(double value) {
-            final fixed = value.toStringAsFixed(2).replaceAll('.', ',');
+            final fixed = value
+                .toStringAsFixed(2)
+                .replaceAll('.', ',');
+
             final parts = fixed.split(',');
-            final chars = parts[0].split('').reversed.toList();
+
+            final chars =
+                parts[0].split('').reversed.toList();
+
             final out = <String>[];
 
-            for (var i = 0; i < chars.length; i++) {
+            for (var i = 0;
+                i < chars.length;
+                i++) {
               if (i > 0 && i % 3 == 0) {
                 out.add('.');
               }
+
               out.add(chars[i]);
             }
 
-            final integer = out.reversed.join();
+            final integer =
+                out.reversed.join();
+
             return 'R\$ $integer,${parts[1]}';
           }
           EOF
 
+          echo "=== Installing dependencies ==="
           flutter pub get
+
+          echo "=== Running Flutter analyzer ==="
           flutter analyze
+
+          echo "=== Building release APK ==="
           flutter build apk --release
+
+          echo "=== APK generated ==="
+          ls -lh build/app/outputs/flutter-apk/
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: bunny-models-apk
           path: bunny_models/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
