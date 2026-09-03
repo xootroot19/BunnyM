@@ -1,0 +1,1297 @@
+name: Build Bunny Models Flutter App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create Flutter project
+        run: |
+          flutter create --platforms=android bunny_models
+          cd bunny_models
+
+          cat > pubspec.yaml <<'EOF'
+          name: bunny_models
+          description: Bunny Models agency management app
+          publish_to: "none"
+          version: 1.0.0+1
+
+          environment:
+            sdk: ">=3.3.0 <4.0.0"
+
+          dependencies:
+            flutter:
+              sdk: flutter
+
+          dev_dependencies:
+            flutter_test:
+              sdk: flutter
+            flutter_lints: ^5.0.0
+
+          flutter:
+            uses-material-design: true
+          EOF
+
+          cat > lib/main.dart <<'EOF'
+          import 'package:flutter/material.dart';
+
+          void main() {
+            runApp(const BunnyModelsApp());
+          }
+
+          class BunnyModelsApp extends StatelessWidget {
+            const BunnyModelsApp({super.key});
+
+            @override
+            Widget build(BuildContext context) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Bunny Models',
+                theme: ThemeData(
+                  useMaterial3: true,
+                  scaffoldBackgroundColor: const Color(0xFFF8F2F4),
+                  colorScheme: ColorScheme.fromSeed(
+                    seedColor: const Color(0xFFB45F7A),
+                    brightness: Brightness.light,
+                  ),
+                ),
+                home: const BunnyShell(),
+              );
+            }
+          }
+
+          class BunnyColors {
+            static const background = Color(0xFFF8F2F4);
+            static const surface = Color(0xFFFFFBFC);
+            static const white = Color(0xFFFFFFFF);
+
+            static const rose = Color(0xFFB45F7A);
+            static const roseDark = Color(0xFF7E3F56);
+            static const roseSoft = Color(0xFFF4DDE5);
+
+            static const wine = Color(0xFF4E2736);
+
+            static const gold = Color(0xFFC89A64);
+            static const goldSoft = Color(0xFFF6EADB);
+
+            static const text = Color(0xFF30262A);
+            static const muted = Color(0xFF817078);
+            static const faint = Color(0xFFAB969E);
+
+            static const border = Color(0xFFEADDE1);
+
+            static const green = Color(0xFF527E68);
+            static const greenSoft = Color(0xFFE7F1EB);
+          }
+
+          class BunnyShell extends StatefulWidget {
+            const BunnyShell({super.key});
+
+            @override
+            State<BunnyShell> createState() => _BunnyShellState();
+          }
+
+          class _BunnyShellState extends State<BunnyShell> {
+            int index = 0;
+
+            final jobs = [
+              const JobItem(
+                client: 'Maison Lumière',
+                role: 'Campanha Beauty',
+                date: 'Hoje • 14:00',
+                location: 'Jardins, São Paulo',
+                amount: 1450,
+                rating: 5,
+              ),
+              const JobItem(
+                client: 'Studio Belle',
+                role: 'Editorial',
+                date: '29 Ago • 10:30',
+                location: 'Vila Madalena',
+                amount: 850,
+                rating: 4,
+              ),
+              const JobItem(
+                client: 'Aurora Fashion',
+                role: 'Lookbook',
+                date: '24 Ago • 09:00',
+                location: 'Pinheiros',
+                amount: 1800,
+                rating: 5,
+              ),
+            ];
+
+            @override
+            Widget build(BuildContext context) {
+              final pages = [
+                DashboardPage(
+                  jobs: jobs,
+                  onNewJob: () => _openNewJob(context),
+                ),
+                JobsPage(jobs: jobs),
+                const ClientsPage(),
+                const FinancePage(),
+                const ProfilePage(),
+              ];
+
+              return Scaffold(
+                body: SafeArea(
+                  child: IndexedStack(
+                    index: index,
+                    children: pages,
+                  ),
+                ),
+                bottomNavigationBar: NavigationBar(
+                  selectedIndex: index,
+                  height: 72,
+                  backgroundColor: BunnyColors.surface,
+                  indicatorColor: BunnyColors.roseSoft,
+                  onDestinationSelected: (value) {
+                    setState(() => index = value);
+                  },
+                  destinations: const [
+                    NavigationDestination(
+                      icon: Icon(Icons.grid_view_rounded),
+                      label: 'Início',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.work_outline_rounded),
+                      selectedIcon: Icon(Icons.work_rounded),
+                      label: 'Jobs',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.groups_2_outlined),
+                      selectedIcon: Icon(Icons.groups_2_rounded),
+                      label: 'Clientes',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.account_balance_wallet_outlined),
+                      selectedIcon: Icon(Icons.account_balance_wallet_rounded),
+                      label: 'Financeiro',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.person_outline_rounded),
+                      selectedIcon: Icon(Icons.person_rounded),
+                      label: 'Perfil',
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            void _openNewJob(BuildContext context) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const NewJobPage(),
+                ),
+              );
+            }
+          }
+
+          class BrandHeader extends StatelessWidget {
+            const BrandHeader({
+              super.key,
+              this.trailing,
+            });
+
+            final Widget? trailing;
+
+            @override
+            Widget build(BuildContext context) {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: BunnyColors.rose,
+                        borderRadius: BorderRadius.circular(17),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x22B45F7A),
+                            blurRadius: 18,
+                            offset: Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.auto_awesome_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'BUNNY',
+                            style: TextStyle(
+                              color: BunnyColors.wine,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2.7,
+                            ),
+                          ),
+                          SizedBox(height: 1),
+                          Text(
+                            'MODELS MANAGEMENT',
+                            style: TextStyle(
+                              color: BunnyColors.faint,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (trailing != null) trailing!,
+                  ],
+                ),
+              );
+            }
+          }
+
+          class DashboardPage extends StatelessWidget {
+            const DashboardPage({
+              super.key,
+              required this.jobs,
+              required this.onNewJob,
+            });
+
+            final List<JobItem> jobs;
+            final VoidCallback onNewJob;
+
+            @override
+            Widget build(BuildContext context) {
+              final total = jobs.fold<double>(
+                0,
+                (sum, job) => sum + job.amount,
+              );
+
+              final average = jobs.isEmpty ? 0 : total / jobs.length;
+
+              return Column(
+                children: [
+                  BrandHeader(
+                    trailing: CircleAvatar(
+                      radius: 21,
+                      backgroundColor: BunnyColors.white,
+                      child: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.notifications_none_rounded,
+                          color: BunnyColors.roseDark,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
+                      children: [
+                        const Text(
+                          'PAINEL DA AGÊNCIA',
+                          style: TextStyle(
+                            color: BunnyColors.rose,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.8,
+                          ),
+                        ),
+                        const SizedBox(height: 9),
+                        const Text(
+                          'Tudo da agência,\norganizado com elegância.',
+                          style: TextStyle(
+                            color: BunnyColors.text,
+                            fontSize: 30,
+                            height: 1.12,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Acompanhe jobs, clientes, cachês e rotina da equipe em um só lugar.',
+                          style: TextStyle(
+                            color: BunnyColors.muted,
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 22),
+                        FinanceHeroCard(
+                          total: total,
+                          jobs: jobs.length,
+                          average: average.toDouble(),
+                        ),
+                        const SizedBox(height: 14),
+                        NewJobCard(onTap: onNewJob),
+                        const SizedBox(height: 30),
+                        Row(
+                          children: [
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'ATIVIDADE',
+                                    style: TextStyle(
+                                      color: BunnyColors.rose,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 1.5,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Jobs recentes',
+                                    style: TextStyle(
+                                      color: BunnyColors.text,
+                                      fontSize: 21,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                color: BunnyColors.roseSoft,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${jobs.length}',
+                                style: const TextStyle(
+                                  color: BunnyColors.roseDark,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 13),
+                        ...jobs.map(
+                          (job) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: JobCard(job: job),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+          }
+
+          class FinanceHeroCard extends StatelessWidget {
+            const FinanceHeroCard({
+              super.key,
+              required this.total,
+              required this.jobs,
+              required this.average,
+            });
+
+            final double total;
+            final int jobs;
+            final double average;
+
+            @override
+            Widget build(BuildContext context) {
+              return Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: BunnyColors.white,
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(color: BunnyColors.border),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x0D4E2736),
+                      blurRadius: 24,
+                      offset: Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                            color: BunnyColors.roseSoft,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: const Icon(
+                            Icons.account_balance_wallet_outlined,
+                            color: BunnyColors.rose,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            color: BunnyColors.greenSoft,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.trending_up_rounded,
+                                size: 15,
+                                color: BunnyColors.green,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Financeiro',
+                                style: TextStyle(
+                                  color: BunnyColors.green,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 19),
+                    const Text(
+                      'Faturamento registrado',
+                      style: TextStyle(
+                        color: BunnyColors.muted,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      money(total),
+                      style: const TextStyle(
+                        color: BunnyColors.wine,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -1.0,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    const Divider(color: BunnyColors.border),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Metric(
+                            label: 'Jobs',
+                            value: '$jobs',
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 34,
+                          color: BunnyColors.border,
+                        ),
+                        const SizedBox(width: 24),
+                        Expanded(
+                          child: Metric(
+                            label: 'Ticket médio',
+                            value: money(average),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }
+          }
+
+          class Metric extends StatelessWidget {
+            const Metric({
+              super.key,
+              required this.label,
+              required this.value,
+            });
+
+            final String label;
+            final String value;
+
+            @override
+            Widget build(BuildContext context) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: BunnyColors.faint,
+                      fontSize: 11,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      color: BunnyColors.text,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              );
+            }
+          }
+
+          class NewJobCard extends StatelessWidget {
+            const NewJobCard({
+              super.key,
+              required this.onTap,
+            });
+
+            final VoidCallback onTap;
+
+            @override
+            Widget build(BuildContext context) {
+              return InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(22),
+                child: Ink(
+                  padding: const EdgeInsets.all(17),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF8FA),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: BunnyColors.roseSoft),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: BunnyColors.roseSoft,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(
+                          Icons.add_rounded,
+                          color: BunnyColors.rose,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 13),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Registrar novo job',
+                              style: TextStyle(
+                                color: BunnyColors.text,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Cliente, cachê, localização e produção.',
+                              style: TextStyle(
+                                color: BunnyColors.muted,
+                                fontSize: 11.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: BunnyColors.rose,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }
+
+          class JobCard extends StatelessWidget {
+            const JobCard({
+              super.key,
+              required this.job,
+            });
+
+            final JobItem job;
+
+            @override
+            Widget build(BuildContext context) {
+              return Container(
+                padding: const EdgeInsets.all(17),
+                decoration: BoxDecoration(
+                  color: BunnyColors.white,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: BunnyColors.border),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: BunnyColors.roseSoft,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(
+                            Icons.business_center_outlined,
+                            color: BunnyColors.rose,
+                            size: 21,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                job.client,
+                                style: const TextStyle(
+                                  color: BunnyColors.text,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                '${job.role} • ${job.date}',
+                                style: const TextStyle(
+                                  color: BunnyColors.faint,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: BunnyColors.goldSoft,
+                            borderRadius: BorderRadius.circular(11),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                size: 14,
+                                color: BunnyColors.gold,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                '${job.rating}',
+                                style: const TextStyle(
+                                  color: BunnyColors.gold,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 13),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 16,
+                          color: BunnyColors.faint,
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: Text(
+                            job.location,
+                            style: const TextStyle(
+                              color: BunnyColors.muted,
+                              fontSize: 11.5,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          money(job.amount),
+                          style: const TextStyle(
+                            color: BunnyColors.roseDark,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }
+          }
+
+          class JobsPage extends StatelessWidget {
+            const JobsPage({
+              super.key,
+              required this.jobs,
+            });
+
+            final List<JobItem> jobs;
+
+            @override
+            Widget build(BuildContext context) {
+              return Column(
+                children: [
+                  const BrandHeader(),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+                      children: [
+                        const PageTitle(
+                          eyebrow: 'AGENDA',
+                          title: 'Jobs',
+                          subtitle:
+                              'Acompanhe trabalhos confirmados, concluídos e futuros.',
+                        ),
+                        const SizedBox(height: 18),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: BunnyColors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: BunnyColors.border),
+                          ),
+                          child: const Row(
+                            children: [
+                              Expanded(
+                                child: FilterTab(
+                                  label: 'Todos',
+                                  selected: true,
+                                ),
+                              ),
+                              Expanded(
+                                child: FilterTab(
+                                  label: 'Próximos',
+                                ),
+                              ),
+                              Expanded(
+                                child: FilterTab(
+                                  label: 'Concluídos',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        ...jobs.map(
+                          (job) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: JobCard(job: job),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+          }
+
+          class FilterTab extends StatelessWidget {
+            const FilterTab({
+              super.key,
+              required this.label,
+              this.selected = false,
+            });
+
+            final String label;
+            final bool selected;
+
+            @override
+            Widget build(BuildContext context) {
+              return Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: selected ? BunnyColors.roseSoft : Colors.transparent,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color:
+                        selected ? BunnyColors.roseDark : BunnyColors.muted,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              );
+            }
+          }
+
+          class ClientsPage extends StatelessWidget {
+            const ClientsPage({super.key});
+
+            @override
+            Widget build(BuildContext context) {
+              return const PlaceholderPage(
+                eyebrow: 'RELACIONAMENTO',
+                title: 'Clientes',
+                subtitle:
+                    'Cadastros, histórico de jobs, contatos e avaliações.',
+                icon: Icons.groups_2_outlined,
+              );
+            }
+          }
+
+          class FinancePage extends StatelessWidget {
+            const FinancePage({super.key});
+
+            @override
+            Widget build(BuildContext context) {
+              return const PlaceholderPage(
+                eyebrow: 'GESTÃO',
+                title: 'Financeiro',
+                subtitle:
+                    'Cachês, despesas, pagamentos pendentes e relatórios.',
+                icon: Icons.account_balance_wallet_outlined,
+              );
+            }
+          }
+
+          class ProfilePage extends StatelessWidget {
+            const ProfilePage({super.key});
+
+            @override
+            Widget build(BuildContext context) {
+              return const PlaceholderPage(
+                eyebrow: 'CONTA',
+                title: 'Perfil',
+                subtitle:
+                    'Dados da agência, equipe, preferências e segurança.',
+                icon: Icons.person_outline_rounded,
+              );
+            }
+          }
+
+          class PlaceholderPage extends StatelessWidget {
+            const PlaceholderPage({
+              super.key,
+              required this.eyebrow,
+              required this.title,
+              required this.subtitle,
+              required this.icon,
+            });
+
+            final String eyebrow;
+            final String title;
+            final String subtitle;
+            final IconData icon;
+
+            @override
+            Widget build(BuildContext context) {
+              return Column(
+                children: [
+                  const BrandHeader(),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+                      children: [
+                        PageTitle(
+                          eyebrow: eyebrow,
+                          title: title,
+                          subtitle: subtitle,
+                        ),
+                        const SizedBox(height: 24),
+                        Container(
+                          height: 250,
+                          decoration: BoxDecoration(
+                            color: BunnyColors.white,
+                            borderRadius: BorderRadius.circular(26),
+                            border: Border.all(color: BunnyColors.border),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 64,
+                                  height: 64,
+                                  decoration: BoxDecoration(
+                                    color: BunnyColors.roseSoft,
+                                    borderRadius: BorderRadius.circular(21),
+                                  ),
+                                  child: Icon(
+                                    icon,
+                                    color: BunnyColors.rose,
+                                    size: 28,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Área pronta para evoluir',
+                                  style: TextStyle(
+                                    color: BunnyColors.text,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 7),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 28),
+                                  child: Text(
+                                    'Esta tela já faz parte da navegação e pode receber os recursos reais do produto.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: BunnyColors.muted,
+                                      fontSize: 12,
+                                      height: 1.45,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+          }
+
+          class PageTitle extends StatelessWidget {
+            const PageTitle({
+              super.key,
+              required this.eyebrow,
+              required this.title,
+              required this.subtitle,
+            });
+
+            final String eyebrow;
+            final String title;
+            final String subtitle;
+
+            @override
+            Widget build(BuildContext context) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    eyebrow,
+                    style: const TextStyle(
+                      color: BunnyColors.rose,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.6,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: BunnyColors.text,
+                      fontSize: 29,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.8,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: BunnyColors.muted,
+                      fontSize: 13,
+                      height: 1.45,
+                    ),
+                  ),
+                ],
+              );
+            }
+          }
+
+          class NewJobPage extends StatefulWidget {
+            const NewJobPage({super.key});
+
+            @override
+            State<NewJobPage> createState() => _NewJobPageState();
+          }
+
+          class _NewJobPageState extends State<NewJobPage> {
+            final client = TextEditingController();
+            final contact = TextEditingController();
+            final location = TextEditingController();
+            final fee = TextEditingController();
+
+            @override
+            void dispose() {
+              client.dispose();
+              contact.dispose();
+              location.dispose();
+              fee.dispose();
+              super.dispose();
+            }
+
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                backgroundColor: BunnyColors.background,
+                appBar: AppBar(
+                  backgroundColor: BunnyColors.background,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  centerTitle: true,
+                  title: const Text(
+                    'Novo job',
+                    style: TextStyle(
+                      color: BunnyColors.text,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 17,
+                    ),
+                  ),
+                ),
+                body: ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 30),
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: BunnyColors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: BunnyColors.border),
+                      ),
+                      child: const Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: BunnyColors.roseSoft,
+                            child: Icon(
+                              Icons.work_outline_rounded,
+                              color: BunnyColors.rose,
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            'Dados do trabalho',
+                            style: TextStyle(
+                              color: BunnyColors.text,
+                              fontSize: 21,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            'Registre as principais informações do job.',
+                            style: TextStyle(
+                              color: BunnyColors.muted,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 22),
+                    BunnyField(
+                      label: 'Cliente / marca',
+                      icon: Icons.business_outlined,
+                      controller: client,
+                      hint: 'Ex: Maison Lumière',
+                    ),
+                    BunnyField(
+                      label: 'Contato responsável',
+                      icon: Icons.person_outline_rounded,
+                      controller: contact,
+                      hint: 'Nome do produtor ou responsável',
+                    ),
+                    BunnyField(
+                      label: 'Local do job',
+                      icon: Icons.location_on_outlined,
+                      controller: location,
+                      hint: 'Estúdio, endereço ou região',
+                    ),
+                    BunnyField(
+                      label: 'Cachê',
+                      icon: Icons.payments_outlined,
+                      controller: fee,
+                      hint: '0,00',
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                    ),
+                    const SizedBox(height: 6),
+                    FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: BunnyColors.rose,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(54),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(17),
+                        ),
+                      ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Protótipo: job validado visualmente.',
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_forward_rounded),
+                      label: const Text(
+                        'Continuar',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }
+
+          class BunnyField extends StatelessWidget {
+            const BunnyField({
+              super.key,
+              required this.label,
+              required this.icon,
+              required this.controller,
+              required this.hint,
+              this.keyboardType,
+            });
+
+            final String label;
+            final IconData icon;
+            final TextEditingController controller;
+            final String hint;
+            final TextInputType? keyboardType;
+
+            @override
+            Widget build(BuildContext context) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: BunnyColors.text,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: controller,
+                      keyboardType: keyboardType,
+                      decoration: InputDecoration(
+                        hintText: hint,
+                        hintStyle: const TextStyle(
+                          color: BunnyColors.faint,
+                          fontSize: 13,
+                        ),
+                        prefixIcon: Icon(
+                          icon,
+                          color: BunnyColors.faint,
+                          size: 20,
+                        ),
+                        filled: true,
+                        fillColor: BunnyColors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 17,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide:
+                              const BorderSide(color: BunnyColors.border),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(
+                            color: BunnyColors.rose,
+                            width: 1.4,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }
+
+          class JobItem {
+            const JobItem({
+              required this.client,
+              required this.role,
+              required this.date,
+              required this.location,
+              required this.amount,
+              required this.rating,
+            });
+
+            final String client;
+            final String role;
+            final String date;
+            final String location;
+            final double amount;
+            final int rating;
+          }
+
+          String money(double value) {
+            final fixed = value.toStringAsFixed(2).replaceAll('.', ',');
+            final parts = fixed.split(',');
+            final chars = parts[0].split('').reversed.toList();
+            final out = <String>[];
+
+            for (var i = 0; i < chars.length; i++) {
+              if (i > 0 && i % 3 == 0) {
+                out.add('.');
+              }
+              out.add(chars[i]);
+            }
+
+            final integer = out.reversed.join();
+            return 'R\$ $integer,${parts[1]}';
+          }
+          EOF
+
+          flutter pub get
+          flutter analyze
+          flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunny-models-apk
+          path: bunny_models/build/app/outputs/flutter-apk/app-release.apk
